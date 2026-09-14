@@ -46,6 +46,8 @@ textarea{width:100%;min-height:80px;border:1px solid #d9dee3;border-radius:10px;
 .info{background:#dbeafe;color:#1e40af}
 .bar{height:12px;background:#e9edf1;border-radius:999px;overflow:hidden;margin-top:10px}
 .fill{height:100%;width:0;background:#111;transition:width .25s}
+.quota-percent{display:flex;justify-content:space-between;margin-top:12px;padding:10px 12px;border:1px solid #e4e8ec;border-radius:10px;background:#fafafa}
+.quota-legend{margin-top:14px;line-height:1.9;font-size:13px}
 .note{line-height:1.55;margin-top:12px}
 .navbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .navbar button{padding:8px 11px}
@@ -119,18 +121,26 @@ textarea{width:100%;min-height:80px;border:1px solid #d9dee3;border-radius:10px;
 <!-- หน้า 2: LINE Monitor -->
 <section id="quotaPage" class="page">
   <div class="card">
-    <h1>📊 LINE Quota Monitor</h1>
+    <h1>LINE Message Quota</h1>
     <div id="quotaUser" class="sub">กำลังตรวจสอบสิทธิ์...</div>
   </div>
 
   <div class="card">
     <div class="quota">
-      <div class="stat"><div>โควตาเดือนนี้</div><b id="limit">-</b></div>
+      <div class="stat"><div>โควตาทั้งเดือน</div><b id="limit">-</b></div>
       <div class="stat"><div>ใช้ไปแล้ว</div><b id="used">-</b></div>
       <div class="stat"><div>คงเหลือ</div><b id="remaining">-</b></div>
     </div>
     <div class="bar"><div id="fill" class="fill"></div></div>
+    <div class="quota-percent"><span>ใช้ไปแล้ว</span><b id="percent">-</b></div>
+    <div class="quota-percent"><span>คาดการณ์สิ้นเดือน</span><b id="forecast">-</b></div>
     <div id="status" class="status info">กำลังโหลดข้อมูล...</div>
+    <div class="quota-legend">
+      <div>🟢 ต่ำกว่า 70% &nbsp;&nbsp; ปกติ</div>
+      <div>🟡 70–89% &nbsp;&nbsp; ควรติดตาม</div>
+      <div>🔴 90% ขึ้นไป &nbsp;&nbsp; ใกล้เต็ม</div>
+      <div>⛔ 100% &nbsp;&nbsp; ส่งไม่ได้</div>
+    </div>
     <div id="extra" class="note small"></div>
     <div class="actions">
       <button class="secondary" id="refreshQuotaBtn">🔄 รีเฟรชโควตา</button>
@@ -358,16 +368,28 @@ function renderQuota(x){
 
   const p=Number(x.percent);
   fill.style.width=Math.min(100,p)+'%';
+  const percentEl=document.getElementById('percent');
+  const forecastEl=document.getElementById('forecast');
+  if(percentEl) percentEl.textContent=p.toFixed(2)+'%';
+  if(forecastEl){
+    const daysInMonth=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
+    const day=Math.max(1,new Date().getDate());
+    const forecast=Math.round(Number(x.consumed||0)/day*daysInMonth);
+    forecastEl.textContent=fmt(forecast);
+  }
 
-  if(x.remaining<=0){
+  if(p>=100 || x.remaining<=0){
     status.className='status danger';
-    status.textContent='🔴 โควตาเต็มแล้ว — การส่งข้อความอาจถูกปฏิเสธ HTTP 429';
-  }else if(p>=80){
+    status.textContent='⛔ 100% — ส่งไม่ได้';
+  }else if(p>=90){
+    status.className='status danger';
+    status.textContent='🔴 90% ขึ้นไป — ใกล้เต็ม';
+  }else if(p>=70){
     status.className='status warn';
-    status.textContent='⚠️ ใกล้เต็ม ('+p.toFixed(1)+'%)';
+    status.textContent='🟡 70–89% — ควรติดตาม';
   }else{
     status.className='status ok';
-    status.textContent='✅ ยังมีโควตาเหลือ ('+p.toFixed(1)+'%)';
+    status.textContent='🟢 ต่ำกว่า 70% — ปกติ';
   }
 
   extra.textContent='ตรวจสอบล่าสุด: '+new Date(x.checkedAt||Date.now()).toLocaleString('th-TH');
