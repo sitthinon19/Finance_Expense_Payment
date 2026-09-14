@@ -56,6 +56,25 @@ textarea{width:100%;min-height:80px;border:1px solid #d9dee3;border-radius:10px;
 .summary,.quota{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .stat{padding:9px 6px}.stat b{font-size:18px}.top{display:block}
 }
+
+/* Compact mobile tab labels: always one row */
+@media (max-width:600px){
+  .actions{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:6px !important;
+    flex-wrap:nowrap !important;
+  }
+  #financeTabBtn,#quotaTabBtn{
+    width:100% !important;
+    min-width:0 !important;
+    white-space:nowrap !important;
+    font-size:12px !important;
+    padding:9px 4px !important;
+    margin:0 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -64,17 +83,17 @@ textarea{width:100%;min-height:80px;border:1px solid #d9dee3;border-radius:10px;
 <!-- เมนู 2 หน้าแบบเดียวกับ Benefits Claim -->
 <div class="actions" style="margin-bottom:14px">
   <button id="financeTabBtn" class="primary" type="button" onclick="showPage('financePage')">
-    Finance_Expense_Payment
+    Finance_Payment
   </button>
   <button id="quotaTabBtn" class="secondary" type="button" onclick="showPage('quotaPage')">
-    LINE_Quota_Monitor
+    LINE Monitor
   </button>
 </div>
 
-<!-- หน้า 1: Finance_Expense_Payment -->
+<!-- หน้า 1: Finance_Payment -->
 <section id="financePage" class="page active">
   <div class="card">
-    <h1>Finance_Expense_Payment</h1>
+    <h1>Finance_Payment</h1>
     <div id="user" class="sub">กำลังตรวจสอบสิทธิ์...</div>
     <div class="summary">
       <div class="stat">รอ Finance<b id="pendingCount">-</b></div>
@@ -97,7 +116,7 @@ textarea{width:100%;min-height:80px;border:1px solid #d9dee3;border-radius:10px;
   </div>
 </section>
 
-<!-- หน้า 2: LINE_Quota_Monitor -->
+<!-- หน้า 2: LINE Monitor -->
 <section id="quotaPage" class="page">
   <div class="card">
     <h1>📊 LINE Quota Monitor</h1>
